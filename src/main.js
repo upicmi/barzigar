@@ -1,6 +1,7 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./style.css";
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 let map = L.map("map").setView([35.532591, 51.490314], 8);
 
@@ -47,7 +48,13 @@ document.getElementById("selectArea").addEventListener("click", () => {
     if (polygon) {
         map.removeLayer(polygon); // Remove previous polygon if any
     }
-    alert("Click on the map to define the area. Click at least 3 times to create a polygon.");
+
+    Swal.fire({
+        title: "انتخاب محدوده",
+        text: "بر روی نقشه کلیک کنید تا محدوده را مشخص کنید٬ حداقل روی سه نقطه کلیک کنید.",
+        icon: "info",
+        confirmButtonText: "شروع"
+    });
 });
 
 // Map click event to define the points and draw the polygon
@@ -72,9 +79,13 @@ map.on("click", (e) => {
         return L.circleMarker(point, { radius: 6, color: "red", fillColor: "red", fillOpacity: 0.7 }).addTo(map);
     });
 
-    // If we have at least 3 points, allow the user to finish the selection
-    if (points.length >= 3) {
-        alert("You can now click the first point to close the polygon.");
+    if (points.length == 3) {
+        Swal.fire({
+            title: "محدوده اولیه انتخاب شد",
+            text: "برای پایان میتوانید روی اولین نقطه کلیک کنید و یا برای دقت بیشتر ادامه دهید.",
+            icon: "info",
+            confirmButtonText: "ادامه"
+        });
     }
 });
 
@@ -91,7 +102,12 @@ map.on("click", (e) => {
         const firstPoint = points[0];
         if (isPointCloseToFirst(e.latlng)) {
             // Close the polygon when the user clicks close to the first point
-            alert(`Area selected: ${JSON.stringify(polygon.getBounds())}`);
+            Swal.fire({
+                title: "محدوده انتخاب شد",
+                text: `مختصات : ${JSON.stringify(polygon.getBounds())}`,
+                icon: "success",
+                confirmButtonText: "تایید"
+            });
 
             // Store the coordinates of the selected polygon
             selectedCoordinates = points.map(point => ({
@@ -100,7 +116,6 @@ map.on("click", (e) => {
             }));
 
             console.log("Selected Coordinates:", selectedCoordinates);
-
 
             // Finalize selection
             isSelecting = false;
